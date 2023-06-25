@@ -1,0 +1,108 @@
+[
+  {
+    "name": "Depósito recorrente",
+    "description": "Automatiza depósitos recorrentes a partir de uma data tendo por base um valor e uma frequência fixa.",
+    "detailedDescription": "Esta regra permite que você programe depósitos recorrentes a partir de uma data específica tendo por base um valor e uma frequência fixa definida por você. Por exemplo, depositar R$100,00 todo dia 05 de cada mês.",
+    "icon": null,
+    "category": "DEPOSIT",
+    "color": "#9EAFBE",
+    "type": "RECURRING",
+    "status": "AVAILABLE_SOON",
+    "configurations": {
+      "requiredExtraConfigurations": true,
+      "requiredDepositValueType": true,
+      "requiredDepositValue": true,
+      "requiredInitialAmount": false,
+      "requiredIncrementAmount": false,
+      "requiredLimitAmount": false,
+      "requiredCardType": false,
+      "requiredStartDate": true,
+      "requiredEndDate": false,
+      "requiredFrequency": true,
+      "transactionOrigin": "BANK_ACCOUNT"
+    }
+  },
+  {
+    "name": "Depósito por arredondamento",
+    "description": "Arredonda as compras para o próximo valor inteiro e deposita a diferença.",
+    "detailedDescription": "Essa regra consiste em arredondar cada compra que você fizer com um cartão de débito ou crédito para o próximo valor inteiro e depositar a diferença. Por exemplo, se fizer uma compra de R$4,50, o aplicativo arredondará o valor para R$5,00 e depositará R$0,50 em seu objetivo.",
+    "icon": "credit-card",
+    "category": "DEPOSIT",
+    "color": "#FFA0AC",
+    "type": "ROUNDING",
+    "status": "ACTIVE",
+    "configurations": {
+      "requiredExtraConfigurations": true,
+      "requiredDepositValueType": false,
+      "requiredDepositValue": false,
+      "requiredInitialAmount": false,
+      "requiredIncrementAmount": false,
+      "requiredLimitAmount": false,
+      "requiredCardType": true,
+      "requiredStartDate": true,
+      "requiredEndDate": false,
+      "requiredFrequency": false,
+      "transactionOrigin": "CARD_PAYMENTS"
+    }
+  },
+  {
+    "name": "Depósito Progressivo",
+    "description": "Aumenta gradualmnente o valor a ser depositado até que o limite máximo e a data final seja atingida.",
+    "detailedDescription": "Essa regra consiste em aumentar gradualmente o valor dos depósitos ao longo do tempo até que um limite máximo e uma data final seja atingida. Por exemplo, você pode configurá-la para que os depósitos comecem com R$20,00 e aumente em R$5,00 a cada semana até atingir o limite de R$50,00 por semana.",
+    "icon": null,
+    "category": "DEPOSIT",
+    "color": "#9EAFBE",
+    "type": "PROGRESSIVE",
+    "status": "INACTIVE",
+    "configurations": {
+      "requiredExtraConfigurations": true,
+      "requiredDepositValueType": false,
+      "requiredDepositValue": false,
+      "requiredInitialAmount": true,
+      "requiredIncrementAmount": true,
+      "requiredLimitAmount": true,
+      "requiredCardType": false,
+      "requiredStartDate": true,
+      "requiredEndDate": true,
+      "requiredFrequency": true,
+      "transactionOrigin": "BANK_ACCOUNT"
+    }
+  },
+  {
+    "name": "Depósito de Salário",
+    "description": "Depositar um valor ou percentual fixo do salário assim que ele for recebido na conta.",
+    "detailedDescription": "Esta regra permite que você defina um valor ou percentual fixo do seu salário a ser depositado diretamente em seu objetivo assim que recebê-lo em sua conta. Por exemplo, você pode configurar para que seja depositado 10% de seu salário logo que recebê-lo.",
+    "icon": "assignment-ind",
+    "category": "DEPOSIT",
+    "color": "#F6D83E",
+    "type": "SALARY",
+    "status": "ACTIVE",
+    "configurations": {
+      "requiredExtraConfigurations": true,
+      "requiredDepositValueType": true,
+      "requiredDepositValue": true,
+      "requiredInitialAmount": false,
+      "requiredIncrementAmount": false,
+      "requiredLimitAmount": false,
+      "requiredCardType": false,
+      "requiredStartDate": true,
+      "requiredEndDate": false,
+      "requiredFrequency": false,
+      "transactionOrigin": "BANK_ACCOUNT"
+    }
+  },
+  {
+    "name": "Depósito baseado no valor alvo",
+    "description": "Calcula e automatiza os depósitos necessários até que o valor alvo do objetivo seja alcançado.",
+    "detailedDescription": "Esta regra permite que ao aplicativo calcular automaticamente o valor a ser depositado e na frequência necessária até que o valor alvo do objetivo seja alcançado. Por exemplo, se seu objetivo é guardar R$5.000 em 6 meses, o aplicativo irá calcular e automatizar depósitos de R$1444,23 por semana para antingir essa meta.",
+    "icon": null,
+    "category": "DEPOSIT",
+    "color": "#9EAFBE",
+    "type": "TARGET_VALUE",
+    "status": "INACTIVE",
+    "configurations": {
+      "requiredExtraConfigurations": false,
+      "transactionOrigin": "BANK_ACCOUNT"
+    }
+  }
+]

@@ -1,0 +1,35 @@
+spring:
+  cloud:
+    discovery:
+      enabled: true
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: identity-service
+          uri: lb://identity-service
+          predicates:
+            - Path=/identity-service/**
+
+        - id: core-bank-service
+          uri: lb://core-bank-service
+          predicates:
+            - Path=/core-bank-service/**
+          filters:
+            - AuthenticationFilter
+
+        - id: saving-goals
+          uri: lb://saving-goals-service
+          predicates:
+            - Path=/saving-goals-service/**
+          filters:
+            - AuthenticationFilter
+
+server:
+  port: 8080
+
+URL_IDENTITY_SERVICE: http://44.204.4.1:8081
+PATH_AUTH_VALIDATE: /auth/validate
+CONNECTION_TIMEOUT: 30

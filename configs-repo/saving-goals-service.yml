@@ -1,0 +1,28 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://saving_goals_service:DLRSvs52KTfXO258@cluster0.dnsxwa2.mongodb.net/saving_goals
+      database: saving_goals
+    config:
+      enabled: true
+    write:
+     writeConcern:
+       isMajority: true
+     timeout:
+       milliseconds: 100000
+
+mongock:
+  migration-scan-package: com.saveforyou.savinggoalsservice.infrastructure.mongo.migration
+
+url:
+  core-bank-service: http://3.91.133.176:8082
+
+path:
+  transfer-internal: /bank-account/transfer/internal
+  card-charge-internal: /card/charge/internal
+
+server:
+  port: 8083
+
+connection:
+  timeout: 200

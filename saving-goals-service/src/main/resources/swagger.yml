@@ -1,0 +1,801 @@
+openapi: 3.0.3
+info:
+  title: Saving Goals Service
+  description: |-
+    Serviço responsável pelo cadastro e gerenciamento dos Objetivos Financeiros
+  version: 1.0.0
+externalDocs:
+  description: Link do repositório do projeto no GitHub
+  url: http://swagger.io
+paths:
+  /category:
+    get:
+      tags:
+        - category
+      summary: Obter todas as categorias
+      operationId: getCategories
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryApiModel'
+        '404':
+          description: Categories not found
+
+  /saving-goal:
+    post:
+      tags:
+        - saving-goal
+      summary: Cadastrar objetivo financeiro
+      operationId: createSavingGoal
+      parameters:
+        - $ref: '#/components/parameters/clientIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSavingGoalApiModel'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingGoalApiModel'
+        '405':
+          description: Validation exception
+
+    get:
+      tags:
+        - saving-goal
+      summary: Obter lista de objetivos financeiros vinculados a um cliente (Paginação)
+      operationId: getSavingGoals
+      parameters:
+        - $ref: '#/components/parameters/clientIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingGoalsSummaryApiModel'
+        '404':
+          description: Saving goals not found
+
+  /saving-goal/{id}:
+    get:
+      tags:
+        - saving-goal
+      summary: Obter objetivo financeiro pelo ID
+      operationId: getSavingGoalById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingGoalApiModel'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Saving goal not found
+
+  /saving-goal/{id}/details:
+    get:
+      tags:
+        - saving-goal
+      summary: Obter detalhes do objetivo financeiro pelo ID
+      operationId: getSavingGoalDetailsdById
+      parameters:
+        - name: id
+          in: path
+          description: ID of Saving goal to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingGoalDetailsApiModel'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Saving goal not found
+
+  /saving-rule/category:
+    get:
+      tags:
+        - saving-rule
+      summary: Obter lista de regras por categoria
+      description: Only one type value can be provided.
+      operationId: getSavingRulesByCategory
+      parameters:
+        - $ref: '#/components/parameters/savingGoalIdParam'
+        - name: category
+          in: query
+          required: true
+          description: Category values that need to be considered for filter
+          schema:
+            $ref: '#/components/schemas/SavingRuleCategory'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavingRuleApiModel'
+
+        '400':
+          description: Invalid type value
+        '404':
+          description: Saving Rule not found
+
+  /saving-rule-automation:
+    post:
+      tags:
+        - saving-rule-automation
+      summary: Cadastrar ou atualizar a configuração feita pelo usuário para uma regra de automatização
+      operationId: configureAndEnableSavingRuleAutomation
+      parameters:
+        - $ref: '#/components/parameters/savingGoalIdParam'
+        - name: savingRuleId
+          in: header
+          description: ID of Saving rule
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavingRuleAutomationApiModel'
+      responses:
+        '201':
+          description: Successful operation
+        '405':
+          description: Validation exception
+
+  /saving-rule-automation/{id}:
+    delete:
+      tags:
+        - saving-rule-automation
+      summary: Desabilitar a configuração feita pelo usuário de uma regra de automatização
+      operationId: disableSavingRuleAutomation
+      parameters:
+        - name: id
+          in: path
+          description: Saving rule Automation id to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid Saving rule automation id value
+
+    get:
+      tags:
+        - saving-rule-automation
+      summary: Obter a configuração feita pelo usuário para uma regra de automatização pelo Id
+      description: Returns a single Saving rule automation
+      operationId: getSavingRuleAutomationById
+      parameters:
+        - name: id
+          in: path
+          description: ID of Saving goal to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingRuleAutomationReponseApiModel'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Saving goal not found
+
+  /saving-rule-automation/transaction:
+    get:
+      tags:
+        - saving-rule-automation
+      summary: Obter as transações de uma regra de automatização (Paginação)
+      operationId: getSavingRuleAutomationTransactions
+      parameters:
+        - $ref: '#/components/parameters/savingGoalIdParam'
+        - $ref: '#/components/parameters/savingRuleIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavingRuleAutomationTransactionsApiModel'
+        '404':
+          description: Saving goals not found
+
+  /transaction/notification:
+    post:
+      tags:
+        - transaction
+      summary: Processar uma notificação de uma transação de um Cliente
+      description: Realiza o processamento da notificação que informa que o cliente realizou uma transação e identifica se essa transação dispara alguma ação em um objetivo financeiro
+      operationId: processTransactionNotification
+      parameters:
+        - $ref: '#/components/parameters/clientIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionNotificationApiModel'
+      responses:
+        '200':
+          description: successful operation
+
+components:
+  schemas:
+    CreateSavingGoalApiModel:
+      required:
+        - name
+        - category
+        - targetAmount
+        - targetDate
+      type: object
+      properties:
+        name:
+          type: string
+          example: Viagem para Paris
+        category:
+          $ref: '#/components/schemas/CategoryApiModel'
+        targetAmount:
+          $ref: '#/components/schemas/TargetAmount'
+        targetDate:
+          $ref: '#/components/schemas/TargetDate'
+    SavingGoalApiModel:
+      required:
+        - id
+        - name
+        - category
+        - targetAmount
+        - targetDate
+        - status
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Viagem para Paris
+        category:
+          $ref: '#/components/schemas/CategoryApiModel'
+        targetAmount:
+          $ref: '#/components/schemas/TargetAmount'
+        targetAmountPretty:
+          type: string
+          example: 'R$15.000,00'
+        targetDate:
+          $ref: '#/components/schemas/TargetDate'
+        targetDatePretty:
+          type: string
+          example: '21 Dez, 2023'
+        currentAmount:
+          type: number
+          minimum: 0.1
+          example: 15000
+        currentAmountPretty:
+          type: string
+          example: 'R$15.000,00'
+        achievedDate:
+          type: string
+          format: date
+          example: 2023-12-01
+        status:
+          $ref: '#/components/schemas/SavingGoalStatus'
+        percentageAlreadySaved:
+          type: number
+          example: 15.90
+
+    SavingGoalDetailsApiModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        savingRulesActives:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingRulesActivesApiModel'
+        savingRulesScheduling:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingRulesSchedulingApiModel'
+
+    SavingGoalsSummaryApiModel:
+      type: object
+      properties:
+        savingGoals:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingGoalApiModel'
+        summaryInformation:
+          $ref: '#/components/schemas/SummaryInformation'
+        paginationInfo:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    CategoryApiModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Viagem"
+        icon:
+          type: string
+        color:
+          type: string
+
+    SavingRuleApiModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Depósito Recorrente
+        description:
+          type: string
+          example: Uma descrição para a regra de Depósito Recorrente
+        detailedDescription:
+          type: string
+          example: Uma descrição detalhada para explicar como a regra de Depósito Recorrente funciona
+        category:
+          $ref: '#/components/schemas/SavingRuleCategory'
+        color:
+          type: string
+        icon:
+          type: string
+        type:
+          $ref: '#/components/schemas/SavingRuleType'
+        status:
+          $ref: '#/components/schemas/SavingRuleStatus'
+        configurations:
+          $ref: '#/components/schemas/SavingRuleConfigurationsApiModel'
+        savingRuleAutomationId:
+          type: string
+          format: uuid
+          example: 1
+        hasAutomationEnabled:
+          type: boolean
+          example: true
+        isRecommended:
+          type: boolean
+          example: true
+
+    SavingRuleConfigurationsApiModel:
+      type: object
+      properties:
+        requiredExtraConfigurations:
+          type: boolean
+          example: false
+        requiredDepositValueType:
+          type: boolean
+          example: false
+        requiredDepositValue:
+          type: boolean
+          example: false
+        requiredInitialAmount:
+          type: boolean
+          example: false
+        requiredIncrementAmount:
+          type: boolean
+          example: false
+        requiredLimitAmount:
+          type: boolean
+          example: false
+        requiredCardType:
+          type: boolean
+          example: false
+        requiredStartDate:
+          type: boolean
+          example: false
+        requiredEndDate:
+          type: boolean
+          example: false
+        requiredFrequency:
+          type: boolean
+          example: false
+        transactionOrigin:
+          type: string
+          description: Identifica qual será a origem da transação
+          example: BANK_ACCOUNT
+          default: BANK_ACCOUNT
+          enum:
+            - BANK_ACCOUNT
+            - CARD_PAYMENTS
+            - SAVING_GOAL
+
+    SavingRuleAutomationApiModel:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/SavingRuleDepositAutomationModel'
+        - $ref: '#/components/schemas/SavingRuleInvestmentAutomationModel'
+
+    SavingRuleDepositAutomationModel:
+      type: object
+      properties:
+        depositValueType:
+          type: string
+          example: AMOUNT
+          enum:
+            - AMOUNT
+            - PERCENTAGE
+        depositValue:
+          type: number
+          minimum: 0.1
+          example: 15000
+        initialAmount:
+          type: number
+          minimum: 0.1
+          example: 15000
+        incrementAmount:
+          type: number
+          minimum: 0.1
+          example: 15000
+        limitAmount:
+          type: number
+          minimum: 0.1
+          example: 15000
+        cardType:
+          type: string
+          example: DEBIT
+          enum:
+            - DEBIT
+            - CREDIT
+            - BOTH
+        startDate:
+          type: string
+          format: date
+          example: 2023-12-01
+        endDate:
+          type: string
+          format: date
+          example: 2023-12-01
+        depositFrequency:
+          type: string
+          example: DAILY
+          enum:
+            - DAILY
+            - WEEKLY
+            - FORTNIGHTLY
+            - MONTHLY
+            - SEMIANNUALLY
+            - ANNUALLY
+        status:
+          type: string
+          example: ENABLED
+          enum:
+            - ENABLED
+            - DISABLED
+            - PAUSED
+
+    SavingRuleInvestmentAutomationModel:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+          example: 2023-12-01
+        endDate:
+          type: string
+          format: date
+          example: 2023-12-01
+        status:
+          type: string
+          example: ENABLED
+          enum:
+            - ENABLED
+            - DISABLED
+            - PAUSED
+
+    SavingRuleAutomationReponseApiModel:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ENABLED
+          enum:
+            - ENABLED
+            - DISABLED
+            - PAUSED
+        configurations:
+          type: object
+
+    SavingRulesActivesApiModel:
+      type: object
+      properties:
+        savingRuleAutomationId:
+          type: string
+          format: uuid
+          example: 1
+        savingRuleId:
+          type: string
+          format: uuid
+          example: 1
+        savingRuleName:
+          type: string
+          example: Depósito Recorrente
+        savingRuleColor:
+          type: string
+        savingRuleIcon:
+          type: string
+        savingAmountTotal:
+          type: number
+          example: 15000
+        savingAmountTotalPretty:
+          type: string
+          example: 'R$15.000,00'
+
+    SavingRulesSchedulingApiModel:
+      type: object
+      properties:
+        savingRuleSchedulingId:
+          type: string
+          format: uuid
+          example: 1
+        savingRuleName:
+          type: string
+          example: Depósito Recorrente
+        depositValue:
+          type: number
+          example: 15000
+        depositValuePretty:
+          type: string
+          example: 'R$15.000,00'
+        scheduleDate:
+          type: string
+          format: date
+          example: 2023-12-01
+
+    TransactionNotificationApiModel:
+      type: object
+      required:
+        - type
+        - amount
+      properties:
+        type:
+          description: Tipo da transação realizada
+          type: string
+          example: SALARY_DEPOSIT
+          enum:
+            - SALARY_DEPOSIT
+            - DEBIT_CHARGE
+            - CREDIT_CHARGE
+        amount:
+          description: Valor da transação realizada
+          type: number
+          minimum: 0.1
+          example: 15000
+
+    SavingRuleAutomationTransactionsApiModel:
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavingRuleAutomationTransactionApiModel'
+        summaryInformation:
+          $ref: '#/components/schemas/TransactionSummaryInformation'
+        paginationInfo:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    SavingRuleAutomationTransactionApiModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        savingRuleId:
+          type: string
+          format: uuid
+        savingRuleName:
+          type: string
+          example: Depósito Recorrente
+        amount:
+          type: number
+          example: 15000
+        amountPretty:
+          type: string
+          example: 'R$15.000,00'
+        type:
+          type: string
+          example: 'AUTOMATION'
+        typeDescription:
+          type: string
+          example: 'Automatização'
+        typeColor:
+          type: string
+        typeIcon:
+          type: string
+        date:
+          type: string
+          format: date
+        datePretty:
+          type: string
+          example: '21 Dez, 2023'
+
+    TargetAmount:
+      type: number
+      minimum: 0.1
+      example: 15000
+
+    TargetDate:
+      type: string
+      format: date
+      example: 2023-12-01
+
+    SavingGoalStatus:
+      type: string
+      description: saving goal status
+      example: ACHIEVED
+      default: IN_PROGRESS
+      enum:
+        - IN_PROGRESS
+        - PAUSED
+        - ACHIEVED
+
+    SavingRuleCategory:
+      type: string
+      description: saving Rules category
+      example: DEPOSIT
+      enum:
+        - DEPOSIT
+        - INVESTMENT
+
+    SavingRuleType:
+      type: string
+      description: saving Rules type
+      example: DEPOSIT
+      enum:
+        - PROGRESSIVE
+        - RECURRING
+        - ROUNDING
+        - SALARY
+        - TARGET_VALUE
+
+    SavingRuleStatus:
+      type: string
+      description: saving Rules status
+      example: ACTIVE
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - AVAILABLE_SOON
+
+    SummaryInformation:
+      type: object
+      properties:
+        timeLeftTotal:
+          type: string
+          example: '3 anos e 6 dias'
+        savingAmountTotal:
+          type: number
+          example: 15000
+        targetAmountTotal:
+          type: number
+          example: 15000
+        savingAmountTotalPretty:
+          type: string
+          example: 'R$15.000,00'
+        targetAmountTotalPretty:
+          type: string
+          example: 'R$15.000,00'
+        percentageAlreadySavedTotal:
+          type: number
+          example: 15.90
+
+    TransactionSummaryInformation:
+      type: object
+      properties:
+        savingAmountTotal:
+          type: number
+          example: 15000
+        savingAmountTotalPretty:
+          type: string
+          example: 'R$15.000,00'
+        savingCountTotal:
+          type: integer
+          format: int32
+
+    PaginationInfo:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          format: int32
+          example: 1
+        totalPages:
+          type: integer
+          format: int32
+          example: 2
+        totalItems:
+          type: integer
+          format: int32
+          example: 2
+
+
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      description: Página desejada
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    sizeParam:
+      in: query
+      name: size
+      description: O número de itens a serem retornados por página
+      schema:
+        type: integer
+        format: int32
+        minimum: 2
+        default: 3
+    clientIdParam:
+      in: header
+      name: clientId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    savingGoalIdParam:
+      in: header
+      name: savingGoalId
+      description: ID of Saving goal
+      required: true
+      schema:
+        type: string
+        format: uuid
+    savingRuleIdParam:
+      in: header
+      name: savingRuleId
+      description: ID of Saving Rule
+      required: true
+      schema:
+        type: string
+        format: uuid

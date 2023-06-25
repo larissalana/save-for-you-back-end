@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:mysql://core-bank-db.cbnyz7f21ihs.us-east-1.rds.amazonaws.com:3306/core-bank-db?createDatabaseIfNotExist=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: admin
+    password: Eh4iYc4fvwZ0OIRQA92I
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: false
+    properties:
+      hibernate:
+        dialect:
+          org.hibernate.dialect: MySQL5Dialect
+
+server:
+  port: 8082
+
+url:
+  identity-service: http://44.204.4.1:8081
+  saving-goals-service: http://44.204.43.115:8083
+
+path:
+  user: /user
+  transaction-notification: /transaction/notification
+
+connection:
+  timeout: 200

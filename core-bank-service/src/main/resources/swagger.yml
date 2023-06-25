@@ -1,0 +1,463 @@
+openapi: 3.0.3
+info:
+  title: Save for You - Bank Service
+  description: |-
+    Essa API centraliza as operações bancárias do app Save for You e simula uma aplicação legado.
+  version: 1.0.0
+externalDocs:
+  description: Link do repositório do projeto no GitHub
+  url: http://swagger.io
+paths:
+  /bank-account:
+    post:
+      tags:
+        - bank-account
+      summary: Abrir uma conta
+      operationId: openBankAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpenBankAccountRequest'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenBankAccountResponse'
+
+    get:
+      tags:
+        - bank-account
+      summary: Obter informações da Conta
+      operationId: getBankAccountInfo
+      parameters:
+        - $ref: '#/components/parameters/branchParam'
+        - $ref: '#/components/parameters/accountNumberParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountApiModel'
+
+  /bank-account/{clientId}:
+    get:
+      tags:
+        - bank-account
+      summary: Obter informações da Conta pelo Identificador do Cliente
+      operationId: getBankAccountInfoByClientId
+      parameters:
+        - $ref: '#/components/parameters/clientIdParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountApiModel'
+
+  /bank-account/deposit:
+    post:
+      tags:
+        - bank-account
+      summary: Depositar valor na Conta (Depósito Comum ou Salário)
+      operationId: depositAmount
+      parameters:
+        - $ref: '#/components/parameters/branchParam'
+        - $ref: '#/components/parameters/accountNumberParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositApiModel'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountApiModel'
+
+  /bank-account/transfer/internal:
+    post:
+      tags:
+        - bank-account
+      summary: Realizar uma transferência após confirmação de que o cliente possui um objetivo com alguma regra relacionada a transferência
+      operationId: transferAmountInternal
+      parameters:
+        - $ref: '#/components/parameters/clientIdHeaderParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferInternalApiModel'
+      responses:
+        '200':
+          description: successful operation
+
+  /card/charge:
+    post:
+      tags:
+        - charge
+      summary: Realizar o processamento de uma cobrança no cartão do cliente (Débito ou Crédito)
+      operationId: processCardCharge
+      parameters:
+        - $ref: '#/components/parameters/clientIdHeaderParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardChargeApiModel'
+      responses:
+        '200':
+          description: successful operation
+
+  /card/charge/internal:
+    post:
+      tags:
+        - charge
+      summary: Realizar o processamento de uma cobrança no cartão do cliente (Débito ou Crédito) após confirmação de que o cliente possui um objetivo com alguma regra relacionada a cobrança
+      operationId: processCardChargeInternal
+      parameters:
+        - $ref: '#/components/parameters/clientIdHeaderParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardChargeInternalApiModel'
+      responses:
+        '200':
+          description: successful operation
+
+  /transaction/{clientId}:
+    get:
+      tags:
+        - transaction
+      summary: Obter as transações realizadas por um Cliente (Paginação)
+      description: Somente as transações processadas com sucesso são retornadas
+      operationId: getClientTransactions
+      parameters:
+        - $ref: '#/components/parameters/clientIdParam'
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/sizeParam'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsApiModel'
+        '404':
+          description: not found
+
+components:
+  schemas:
+    OpenBankAccountRequest:
+      type: object
+      required:
+        - name
+        - socialId
+        - dateOfBirth
+        - email
+      properties:
+        name:
+          type: string
+          example: Augusta Ada Byron King
+        socialId:
+          type: string
+          example: 111111111
+        dateOfBirth:
+          type: string
+          format: date
+        email:
+          type: string
+          example: ada.lovelace@email.com
+        username:
+          type: string
+          example: ada.lovelace
+        password:
+          type: string
+          format: password
+
+    OpenBankAccountResponse:
+      type: object
+      properties:
+        branch:
+          type: string
+          example: 001
+        accountNumber:
+          type: string
+          example: 111111111
+        balance:
+          type: number
+          example: 15000
+        type:
+          $ref: '#/components/schemas/BankAccountTypeApiModel'
+        status:
+          $ref: '#/components/schemas/StatusApiModel'
+
+    BankAccountApiModel:
+      type: object
+      properties:
+        branch:
+          type: string
+          example: 001
+        accountNumber:
+          type: string
+          example: 111111111
+        balance:
+          type: number
+          example: 15000
+        balancePretty:
+          type: string
+          example: 'R$1500,00'
+        type:
+          $ref: '#/components/schemas/BankAccountTypeApiModel'
+        status:
+          $ref: '#/components/schemas/StatusApiModel'
+        client:
+          $ref: '#/components/schemas/ClientApiModel'
+
+    TransactionsApiModel:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionApiModel'
+        paginationInfo:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    ClientApiModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Augusta Ada Byron King
+        firstname:
+          type: string
+          example: Augusta
+
+    TransactionApiModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          example: 'Marie Curie'
+        amountPretty:
+          type: string
+          example: 'R$500,00'
+        datePretty:
+          type: string
+          example: 'Quinta-feira, 21 Dez - 08:30'
+        type:
+          $ref: '#/components/schemas/TransactionTypeApiModel'
+        typeDescription:
+          type: string
+          example: 'Déposito'
+        typeColor:
+          type: string
+        typeIcon:
+          type: string
+
+    DepositApiModel:
+      type: object
+      required:
+        - type
+        - amount
+      properties:
+        type:
+          $ref: '#/components/schemas/DepositTypeApiModel'
+        amount:
+          description: Valor a ser depositado na conta
+          type: number
+          minimum: 0.1
+          example: 15000
+
+    TransferInternalApiModel:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          description: Valor a ser transferido
+          type: number
+          minimum: 0.1
+          example: 15000
+        recipient:
+          $ref: '#/components/schemas/RecipientApiModel'
+
+    CardChargeApiModel:
+      type: object
+      required:
+        - type
+        - amount
+      properties:
+        type:
+          $ref: '#/components/schemas/ChargeTypeApiModel'
+        amount:
+          description: Valor a ser cobrado no cartão
+          type: number
+          minimum: 0.1
+          example: 15000
+
+    CardChargeInternalApiModel:
+      type: object
+      required:
+        - type
+        - amount
+      properties:
+        type:
+          $ref: '#/components/schemas/ChargeTypeApiModel'
+        amount:
+          description: Valor a ser cobrado no cartão
+          type: number
+          minimum: 0.1
+          example: 15000
+        recipient:
+          $ref: '#/components/schemas/RecipientApiModel'
+
+    RecipientApiModel:
+      type: object
+      required:
+        - type
+        - id
+        - description
+      properties:
+        type:
+          type: string
+          example: SAVING_GOAL
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          example: 'Viagem para Paris'
+
+    PaginationInfo:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          format: int32
+          example: 1
+        totalPages:
+          type: integer
+          format: int32
+          example: 2
+        totalItems:
+          type: integer
+          format: int32
+          example: 2
+
+    StatusApiModel:
+      type: string
+      example: ACTIVE
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - BLOCKED
+
+    BankAccountTypeApiModel:
+      type: string
+      example: CHECKING_ACCOUNT
+      enum:
+        - CHECKING_ACCOUNT
+        - SAVING_ACCOUNT
+        - SALARY_ACCOUNT
+
+    TransactionTypeApiModel:
+      type: string
+      example: DEPOSIT
+      enum:
+        - DEPOSIT
+        - SALARY_DEPOSIT
+        - TRANSFER
+        - DEBIT_CHARGE
+        - CREDIT_CHARGE
+        - WITHDRAWAL
+        - INVESTMENT
+        - REDEEM
+        - AUTOMATION
+
+    DepositTypeApiModel:
+      description: Tipo de depósito a ser realizado
+      type: string
+      example: SALARY_DEPOSIT
+      enum:
+        - DEPOSIT
+        - SALARY_DEPOSIT
+
+    ChargeTypeApiModel:
+      description: Tipo da cobrança a ser realizada
+      type: string
+      example: DEBIT
+      enum:
+        - DEBIT
+        - CREDIT
+
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      description: Página desejada
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+    sizeParam:
+      in: query
+      name: size
+      description: O número de itens a serem retornados por página
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 3
+    branchParam:
+      in: header
+      name: branch
+      required: true
+      schema:
+        type: string
+        example: 001
+    accountNumberParam:
+      in: header
+      name: accountNumber
+      required: true
+      schema:
+        type: string
+        example: 111111111
+    amountParam:
+      in: header
+      name: amount
+      required: true
+      description: Valor a ser depositado
+      schema:
+        type: number
+        minimum: 0.1
+        example: 15000
+    clientIdParam:
+      in: path
+      name: clientId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    clientIdHeaderParam:
+      in: header
+      name: clientId
+      required: true
+      schema:
+        type: string
+        format: uuid

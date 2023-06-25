@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Save for You - Bank Service
+  description: |-
+    Essa API centraliza as operações de criação, autenticação e autorização do usuário do app Save for You
+  version: 1.0.0
+externalDocs:
+  description: Link do repositório do projeto no GitHub
+  url: http://swagger.io
+paths:
+  /user:
+    post:
+      tags:
+        - user
+      summary: Criar usuário
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResponse'
+
+  /auth/token:
+    post:
+      tags:
+        - auth
+      summary: Autentica usuário e gera o token se credenciais forem válidas
+      operationId: generateToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/validate:
+    get:
+      tags:
+        - auth
+      summary: Validar token
+      operationId: validateToken
+      parameters:
+        - name: token
+          in: header
+          description: Token a ser validado
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - socialId
+        - email
+        - username
+        - password
+        - clientId
+      properties:
+        name:
+          type: string
+          example: Augusta Ada Byron King
+        socialId:
+          type: string
+          example: 111111111
+        email:
+          type: string
+          example: ada.lovelace@email.com
+        username:
+          type: string
+          example: ada.lovelace
+        password:
+          type: string
+          format: password
+        clientId:
+          type: string
+          format: uuid
+
+    CreateUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          example: ACTIVE
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - BLOCKED
+
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: ada.lovelace
+        password:
+          type: string
+          format: password
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string

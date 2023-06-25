@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Reserva de emergência",
+    "icon": "campaign",
+    "color": "#F6D83E"
+  },
+  {
+    "name": "Férias",
+    "icon": "airplanemode-active",
+    "color": "#81D389"
+  },
+  {
+    "name": "Aposentadoria",
+    "icon": "free-breakfast",
+    "color": "#A9FF22"
+  },
+  {
+    "name": "Compra de imóvel",
+    "icon": "home",
+    "color": "#C699FF"
+  },
+  {
+    "name": "Despesas sazonais",
+    "icon": "event",
+    "color": "#FFCA99"
+  },
+  {
+    "name": "Saúde",
+    "icon": "medical-services",
+    "color": "#FFA0AC"
+  },
+  {
+    "name": "Educação",
+    "icon": "menu-book",
+    "color": "#89D5FF"
+  }
+]
